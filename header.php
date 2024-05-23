@@ -8,3 +8,10 @@
     <?php wp_head() ?>
 </head>
 <body>
+    <header class="header">
+        <div class="container">
+        <?php 
+            mine_header_menu();
+        ?>
+        </div>
+    </header>
