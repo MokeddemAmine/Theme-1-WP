@@ -1,9 +1,21 @@
 <?php get_header() ?>
 <div class="container">
-    <?php get_template_part('includes/section','archive'); ?>
+    <section class="row">
+        <div class="col-lg-3">
+            <?php
+                if(is_active_sidebar('main-sidebar')){
+                    dynamic_sidebar('main-sidebar');
+                }
+            ?>
+        </div>
+        <div class="col-lg-9">
+        <?php get_template_part('includes/section','archive'); ?>
 
-    <?php previous_posts_link() ?>
-    <?php next_posts_link(); ?>
+        <?php previous_posts_link() ?>
+        <?php next_posts_link(); ?>
+        </div>
+    </section>
+    
     
     <!-- <?php
     global $wp_query ;
