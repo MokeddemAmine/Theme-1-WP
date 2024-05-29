@@ -1,5 +1,10 @@
 <?php 
 
+    // Include PHPMailer library
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\Exception;
+
+    require_once('vendor/autoload.php');
 // load css files
 function add_styles(){
     // add bootstrap and fontAwsome from google
@@ -24,6 +29,7 @@ function add_scripts(){
     wp_enqueue_script('popper-js');
     wp_enqueue_script('bootstrap-js');
     wp_enqueue_script('main-js');
+    // wp_localize_script('custom-ajax', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
     
 }
 add_action('wp_enqueue_scripts','add_scripts');
@@ -135,3 +141,76 @@ function my_first_taxonomy(){
 
 }
 add_action('init','my_first_taxonomy');
+
+// custom ajax form
+
+function enquiry_form(){
+
+    if(!wp_verify_nonce($_POST['nonce'],'ajax-nonce')){
+        wp_send_json_error('Nonce is incorrect',401);
+        die();
+    }
+    $formdata = [];
+    wp_parse_str($_POST['enquiry'],$formdata);
+
+    // Admin email
+    $admin_email = get_option('admin_email');
+    
+    // Email headers
+    $headers[] = 'Content-Type: text/html; charset=UTF-8';
+    $headers[] = 'From:' . $admin_email;
+    $headers[] = 'Reply-to:'. $formdata['email'];
+
+    // Who are we sending the email to ?
+    $send_to = $admin_email;
+
+    // subject
+    $subject = "Enquiry Form : ".$formdata['fname'].' '.$formdata['lname'];
+
+    // Message
+    $message = '';
+
+    foreach($formdata as $index => $field){
+        $message .= '<strong style="text-transform:capitalize;">'.$index.': </strong>'.$field.'<br/>';
+    }
+
+// Create a new PHPMailer instance
+$mail = new PHPMailer();
+
+try {
+    // Server settings
+    $mail->isSMTP(); // Set mailer to use SMTP
+    $mail->Host = 'smtp.gmail.com'; // Specify main and backup SMTP servers
+    $mail->SMTPAuth = true; // Enable SMTP authentication
+    $mail->Username = 'mokeddemamine1707@gmail.com'; // SMTP username
+    $mail->Password = 'sryq qtqx qtar zuhw'; // SMTP password
+    $mail->SMTPSecure = 'tls'; // Enable TLS encryption, `ssl` also accepted
+    $mail->Port = 587; // TCP port to connect to
+
+    // Recipients
+    $mail->setFrom($formdata['email'], $formdata['fname'].' '.$formdata['lname']);
+    $mail->addAddress($send_to, 'mokeddem amine'); // Add a recipient
+    // $mail->addReplyTo('replyto@example.com', 'Reply To');
+
+    // Content
+    $mail->isHTML(true); // Set email format to HTML
+    $mail->Subject = $subject;
+    $mail->Body    = $message;
+    // $mail->AltBody = 'This is the plain text version of the email.';
+
+    // Send the email
+    if($mail->send()) {
+        wp_send_json_success('Email sent');
+    } else {
+        wp_send_json_error('Email error');
+    }
+} catch (Exception $e) {
+    wp_send_json_error($e->getMessage());
+}
+
+    // wp_send_json_success($formdata['fname']);
+}
+
+add_action('wp_ajax_enquiry','enquiry_form');
+add_action('wp_ajax_nopriv_enquiry','enquiry_form');
+

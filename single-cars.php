@@ -13,17 +13,25 @@
     <?php get_template_part('includes/section','cars'); ?>
     <?php wp_link_pages(); ?>
     <ul>
-        <li>
-            Color:
-            <?php echo get_post_meta($post->ID,'color',true) ?>
-        </li>
+        <?php if(get_post_meta($post->ID,'color',true)){ ?>
+            <li>
+                Color:
+                <?php echo get_post_meta($post->ID,'color',true) ?>
+            </li>
+        <?php } ?>
+        
         <?php if(get_post_meta($post->ID,'registration',true)){ ?>
-                <li>
-                    Registration:
-                    <?php echo get_post_meta($post->ID,'registration',true) ?>
-                </li>
+            <?php the_field('registration'); ?>
+            <li>
+                Registration:
+                <?php echo get_post_meta($post->ID,'registration',true) ?>
+            </li>
         <?php } ?>
     </ul>
+
+    <div>
+        <?php get_template_part('includes/form','enquiry'); ?>
+    </div>
 
     
 </div>
