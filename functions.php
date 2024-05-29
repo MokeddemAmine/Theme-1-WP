@@ -5,6 +5,7 @@
     use PHPMailer\PHPMailer\Exception;
 
     require_once('vendor/autoload.php');
+    require_once('wp-bootstrap-navwalker.php');
 // load css files
 function add_styles(){
     // add bootstrap and fontAwsome from google
@@ -49,7 +50,8 @@ register_nav_menus(
     array(
         'top-menu'          => 'Top Menu Location',
         'mobile-menu'       => 'Mobile Menu Location',
-        'footer-menu'       => 'Footer Menu Location'
+        'footer-menu'       => 'Footer Menu Location',
+        'bootstrap-menu'    => 'Bootstrap Menu',
     )
 );
 
@@ -65,6 +67,15 @@ function mine_footer_menu(){
     wp_nav_menu(array(
         'theme_location'        => 'footer-menu',
         'menu_class'            => 'footer-bar',
+    ));
+}
+function mine_bootstrap_menu(){
+    wp_nav_menu(array(
+        'theme_location'    => 'bootstrap-menu',
+        'container'         => false,
+        'menu_class'        => 'navbar-nav me-auto mb-2 mb-lg-0',
+        'depth'                 => 2,
+        'walker'                => new WP_Bootstrap_Navwalker()
     ));
 }
 
