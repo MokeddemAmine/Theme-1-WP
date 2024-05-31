@@ -1,10 +1,13 @@
 <?php 
 
-    // Include PHPMailer library
-    use PHPMailer\PHPMailer\PHPMailer;
-    use PHPMailer\PHPMailer\Exception;
+    //  Include PHPMailer library
+    // use PHPMailer\PHPMailer\PHPMailer;
+    // use PHPMailer\PHPMailer\Exception;
 
-    require_once('vendor/autoload.php');
+    // require_once('vendor/autoload.php');
+
+use PHPMailer\PHPMailer\PHPMailer;
+
     require_once('wp-bootstrap-navwalker.php');
 // load css files
 function add_styles(){
@@ -185,43 +188,71 @@ function enquiry_form(){
         $message .= '<strong style="text-transform:capitalize;">'.$index.': </strong>'.$field.'<br/>';
     }
 
-// Create a new PHPMailer instance
-$mail = new PHPMailer();
 
-try {
-    // Server settings
-    $mail->isSMTP(); // Set mailer to use SMTP
-    $mail->Host = 'smtp.gmail.com'; // Specify main and backup SMTP servers
-    $mail->SMTPAuth = true; // Enable SMTP authentication
-    $mail->Username = 'mokeddemamine1707@gmail.com'; // SMTP username
-    $mail->Password = 'sryq qtqx qtar zuhw'; // SMTP password
-    $mail->SMTPSecure = 'tls'; // Enable TLS encryption, `ssl` also accepted
-    $mail->Port = 587; // TCP port to connect to
-
-    // Recipients
-    $mail->setFrom($formdata['email'], $formdata['fname'].' '.$formdata['lname']);
-    $mail->addAddress($send_to, 'mokeddem amine'); // Add a recipient
-    // $mail->addReplyTo('replyto@example.com', 'Reply To');
-
-    // Content
-    $mail->isHTML(true); // Set email format to HTML
-    $mail->Subject = $subject;
-    $mail->Body    = $message;
-    // $mail->AltBody = 'This is the plain text version of the email.';
-
-    // Send the email
-    if($mail->send()) {
-        wp_send_json_success('Email sent');
-    } else {
-        wp_send_json_error('Email error');
+// Send email using wp_mail() function
+    
+    try{
+        if(wp_mail( $send_to, $subject, $message, $headers )){
+            wp_send_json_success('Email sent');
+        }else{
+            wp_send_json_error('Email error');
+        }
+    }catch(Exception $e){
+        wp_send_json_error($e->getMessage());
     }
-} catch (Exception $e) {
-    wp_send_json_error($e->getMessage());
-}
+
+// Create a new PHPMailer instance
+// $mail = new PHPMailer();
+
+// try {
+//     // Server settings
+//     $mail->isSMTP(); // Set mailer to use SMTP
+//     $mail->Host = 'smtp.gmail.com'; // Specify main and backup SMTP servers
+//     $mail->SMTPAuth = true; // Enable SMTP authentication
+//     $mail->Username = 'mokeddemamine1707@gmail.com'; // SMTP username
+//     $mail->Password = 'sryq qtqx qtar zuhw'; // SMTP password
+//     $mail->SMTPSecure = 'tls'; // Enable TLS encryption, `ssl` also accepted
+//     $mail->Port = 587; // TCP port to connect to
+
+//     // Recipients
+//     $mail->setFrom($formdata['email'], $formdata['fname'].' '.$formdata['lname']);
+//     $mail->addAddress($send_to, 'mokeddem amine'); // Add a recipient
+//     // $mail->addReplyTo('replyto@example.com', 'Reply To');
+
+//     // Content
+//     $mail->isHTML(true); // Set email format to HTML
+//     $mail->Subject = $subject;
+//     $mail->Body    = $message;
+//     // $mail->AltBody = 'This is the plain text version of the email.';
+
+//     // Send the email
+//     if($mail->send()) {
+//         wp_send_json_success('Email sent');
+//     } else {
+//         wp_send_json_error('Email error');
+//     }
+// } catch (Exception $e) {
+//     wp_send_json_error($e->getMessage());
+// }
 
     // wp_send_json_success($formdata['fname']);
 }
 
 add_action('wp_ajax_enquiry','enquiry_form');
 add_action('wp_ajax_nopriv_enquiry','enquiry_form');
+
+// php mailer
+
+function custom_mailer(PHPMailer $phpmailer){
+    $phpmailer->SetFrom('mokeddem2024@gmail.com','mohammed mokeddem');
+    $phpmailer->Host        = 'smtp.gmail.com';
+    $phpmailer->Port        = 587;
+    $phpmailer->SMTPAuth    = true;
+    $phpmailer->SMTPSecure  = 'tls';
+    $phpmailer->Username = 'mokeddemamine1707@gmail.com';
+    $phpmailer->Password = 'sryq qtqx qtar zuhw';
+    $phpmailer->isSMTP();
+}
+
+add_action('phpmailer_init','custom_mailer');
 
