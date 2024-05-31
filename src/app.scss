@@ -1,0 +1,9 @@
+$theme-colors:(
+    "primary":#960160,
+    "danger":red,
+);
+
+@import 'node_modules/bootstrap/scss/bootstrap';
+
+@import 'colors';
+@import 'header';
