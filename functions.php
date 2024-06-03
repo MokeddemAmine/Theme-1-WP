@@ -256,3 +256,62 @@ function custom_mailer(PHPMailer $phpmailer){
 
 add_action('phpmailer_init','custom_mailer');
 
+
+// shortcode of latest cars
+
+function latest_cars(){
+    ob_start();
+    get_template_part('includes/latest','cars');
+    return ob_get_clean();
+}
+add_shortcode('latest_cars','latest_cars');
+
+function my_phone(){
+    return '<a href="">+213655069573</a>';
+}
+add_shortcode('phone','my_phone');
+
+//search query function for search-cars page
+function search_query(){
+    $args = [
+        'post_type'     => 'cars',
+        'posts_per_page'=> 0,
+        'tax_query'     => [],
+        'meta_query'    => [
+            'relation'  => 'AND',
+        ]
+    ];
+    // set the keyword
+    if(isset($_GET['keyword']) && !empty($_GET['keyword'])){
+        $args['s'] = sanitize_text_field($_GET['keyword']);
+    }
+
+    // set the brand
+    if(isset($_GET['brand']) && !empty($_GET['brand'])){
+        $args['tax_query'][] = [
+            'taxonomy'  => 'brands',
+            'field'     => 'slug',
+            'terms'     => array(sanitize_text_field($_GET['brand'])),
+        ];
+    }
+    // set the price above
+    if(isset($_GET['price_above']) && !empty($_GET['price_above'])){
+        $args['meta_query'][] = array(
+            'key'       => 'price',
+            'value'     => sanitize_text_field($_GET['price_above']),
+            'compare'   => '>=',
+            'type'      => 'numeric' 
+        );
+    }
+    //set the price below
+    if(isset($_GET['price_below']) && !empty($_GET['price_below'])){
+        $args['meta_query'][] = array(
+            'key'       => 'price',
+            'value'     => sanitize_text_field($_GET['price_below']),
+            'compare'   => '<=',
+            'type'      => 'numeric' 
+        );
+    }
+
+    return new WP_Query($args);
+}
